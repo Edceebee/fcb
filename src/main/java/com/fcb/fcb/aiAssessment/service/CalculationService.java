@@ -31,40 +31,47 @@ public class CalculationService {
                 double total = 0;
                 for (int i = 0; i < calculation.getValues().size(); i++) {
                     total = total + calculation.getValues().get(i);
+
                 }
                 double average = total / calculation.getValues().size();
-                calculation.setActualAnswer(average);
+                double averageAnswer = Math.round(average * 100.0) / 100.0;
+                calculation.setActualAnswer(averageAnswer);
                 if (calculation.getActualAnswer() == calculation.getReportedAnswer()) {
                     calculation.setCorrect(true);
                 }
             }
 
             if (Objects.equals(calculation.getOperation(), "SD")) {
-                double sum = 0;
-                double mean;
-                for (int i = 0; i < calculation.getValues().size(); i++) {
-                    sum = sum + calculation.getValues().get(i);
-                }
-                mean = sum / calculation.getValues().size();
-                sum = 0;
-                for (int i = 0; i < calculation.getValues().size(); i++) {
-                    sum = Math.pow((calculation.getValues().get(1) - mean), 2);
-                }
-                mean = sum / (calculation.getValues().size() - 1);
-                double deviation = Math.sqrt(mean);
+                double sum = 0.0, standardDeviation = 0.0;
+                int length = calculation.getValues().size();
 
-                calculation.setActualAnswer(deviation);
+                for(double num : calculation.getValues()) {
+                    sum += num;
+                }
+                double mean = sum/length;
+                for(double num: calculation.getValues()) {
+                    standardDeviation += Math.pow(num - mean, 2);
+                }
+
+                double answer =  Math.sqrt(standardDeviation/length);
+                double sdAnswer = Math.round(answer * 100.0) / 100.0;
+
+                calculation.setActualAnswer(sdAnswer);
                 if (calculation.getActualAnswer() == calculation.getReportedAnswer()) {
                     calculation.setCorrect(true);
                 }
             }
 
-        calculationRepository.save(calculation);
-    }
+                calculationRepository.save(calculation);
+            }
+
 
     public List<Calculation> getAllcalculations() {
         List<Calculation> allCalculations =  calculationRepository.findAll();
         return allCalculations;
     }
 
-}
+    }
+
+
+
